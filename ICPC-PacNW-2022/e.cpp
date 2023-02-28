@@ -1,10 +1,16 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-struct Ball {
+struct Pos {
 	int tube, height;
-}
+};
 
+struct Color {
+	int color, i;
+};
+
+// need to know where balls of color are
+// need to know what balls are at position
 
 int main() {
 	ios::sync_with_stdio(false);
@@ -12,11 +18,18 @@ int main() {
 	
 	int n; cin >> n;
 	
-	vector<vector<Ball>> colors(n+2); // index is color
+	vector<vector<Pos>> colors(n+1); // [color][i]
 	
-	vector<int> unfilledTubes(n+1);
+	vector<vector<Color>> positions(n+2, vector<int>(3)); // [tube][height]
+	
 	
 	for (int i = 0; i <= n; i++) {
 		int b, m, t; cin >> b >> m >> t;
 		
-		colors[b].push_back({
+		positions[i][0] = {b, 0};
+		
+		colors[b].push_back({i, 0}):;
+		colors[m].push_back({i, 1});
+		colors[t].push_back({i, 2});
+	}
+}
