@@ -1,6 +1,8 @@
 #include <bits/stdc++.h>
 using namespace std;
 
+// SOLVED (According to sample cases)
+
 int main() {
 	ios::sync_with_stdio(false);
 	cin.tie(nullptr);

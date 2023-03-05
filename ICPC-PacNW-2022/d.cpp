@@ -1,6 +1,8 @@
 #include <bits/stdc++.h>
 using namespace std;
 
+// NOT SOLVED. WRONG ALGORITHM.
+
 int barn_x;
 
 struct Treasure {
