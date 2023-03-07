@@ -1,6 +1,7 @@
 #include <bits/stdc++.h>
 using namespace std;
 
+// Champernowne Count
 // SOLVED (According to sample cases)
 
 int main() {
