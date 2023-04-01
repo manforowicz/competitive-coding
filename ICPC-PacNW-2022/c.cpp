@@ -45,8 +45,8 @@ int main() {
 		// To prevent this we do: champ %= k
 		// But won't this mess up the result? No!
 		// Thanks to this simple property of the modulo operation:
-		// (a + b) % k = ((a % k) + (b % k)) % m
-		// (a ⋅ b) % k = ((a % k) * (b % k)) % m
+		// (a + b) % k = ((a % k) + (b % k)) % k
+		// (a * b) % k = ((a % k) * (b % k)) % k
 		// See: https://usaco.guide/gold/modular?lang=cpp#introduction
 		champ %= k;
 		
