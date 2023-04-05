@@ -17,7 +17,6 @@ int get_dead(vector<vector<int>>& links, int root, int parent) {
 int main() {
 	ios::sync_with_stdio(false);
 	cin.tie(nullptr);
-	//freopen("in.txt", "r", stdin);
 	
 	int tests; cin >> tests;
 	for (int t = 0; t < tests; t++) {
