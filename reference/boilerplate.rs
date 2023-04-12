@@ -52,14 +52,18 @@ use std::cmp::{max, min};
 use std::collections::HashSet;
 use std::io::{stdin, stdout, BufWriter, Write};
 
-fn next_line() -> String {
+fn raw_line() -> String {
     let mut s = String::new();
     stdin().read_line(&mut s).expect("Failed read");
     s
 }
 
+fn next_line<T: std::str::FromStr>() -> T {
+    raw_line().parse().ok().expect("Failed parse")
+}
+
 fn next_array<T: std::str::FromStr>() -> Vec<T> {
-    next_line()
+    raw_line()
         .split_whitespace()
         .map(|s| s.parse().ok().expect("Failed parse"))
         .collect()
@@ -68,5 +72,5 @@ fn next_array<T: std::str::FromStr>() -> Vec<T> {
 
 fn main() {
     let mut out = BufWriter::new(stdout());
-    writeln!(out, "{}", 5).ok();
+    writeln!(out, "{}", 5).unwrap();
 }
