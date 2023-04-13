@@ -1,8 +1,9 @@
 #![allow(unused_imports)]
 #![allow(dead_code)]
+use std::io::{stdin, stdout, BufWriter, Write};
 use std::cmp::{max, min};
 use std::collections::HashSet;
-use std::io::{stdin, stdout, BufWriter, Write};
+
 
 fn raw_line() -> String {
     let mut s = String::new();
@@ -21,48 +22,31 @@ fn next_arr<T: std::str::FromStr>() -> Vec<T> {
         .collect()
 }
 
-fn compute(
-    curr: usize,
-    prev: usize,
-    k: usize,
-    remaining: &mut usize,
-    adj: &Vec<Vec<usize>>,
-) -> usize {
-
-    let mut heights = vec![0, 0];
-    for other in &adj[curr] {
-        if *other != prev {
-            heights.push(compute(*other, curr, k, remaining, adj) + 1);
-        }
-    }
-    heights.sort();
-
-    if heights[heights.len() - 2] < k {
-        *remaining -= 1;
-    }
-
-    heights[heights.len() - 2]
-}
-
 fn main() {
     let mut out = BufWriter::new(stdout());
 
-    let t: usize = next_line();
 
-    for _ in 0..t {
-        let _ = raw_line();
-        let line = next_arr::<usize>();
-        let n = line[0];
-        let k = line[1];
+    let tmp = next_arr::<u64>();
+    let _n = tmp[0];
+    let k = tmp[1];
+    let d = tmp[2];
+    let a = next_arr::<u64>();
 
-        let mut adj = vec![Vec::new(); n + 1];
-        for _ in 1..n {
-            let edge = next_arr::<usize>();
-            adj[edge[0]].push(edge[1]);
-            adj[edge[1]].push(edge[0]);
+
+    // greatest sum so far where (sum % d = index)
+    let mut dp = vec![0, d];
+
+    // number of terms
+    let mut quantity = vec![0, d];
+
+    for elem in a {
+        for i in 0..d {
+            let new_i = ((i + elem) % d) as usize;
+            dp[new_i] = max(dp[new_i], dp[i as usize] + elem);
         }
-        let mut remaining = n;
-        compute(1, 1, k, &mut remaining, &adj);
-        writeln!(out, "{}", remaining).unwrap();
     }
+
+
+
+    writeln!(out, "{}", 5).unwrap();
 }
