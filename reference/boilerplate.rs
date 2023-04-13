@@ -47,10 +47,12 @@ fn main() {
 
 ----- OR ----------
 
-#[allow(unused_imports)]
+#![allow(unused_imports)]
+#![allow(dead_code)]
+use std::io::{stdin, stdout, BufWriter, Write};
 use std::cmp::{max, min};
 use std::collections::HashSet;
-use std::io::{stdin, stdout, BufWriter, Write};
+
 
 fn raw_line() -> String {
     let mut s = String::new();
@@ -59,16 +61,15 @@ fn raw_line() -> String {
 }
 
 fn next_line<T: std::str::FromStr>() -> T {
-    raw_line().parse().ok().expect("Failed parse")
+    raw_line().trim().parse().ok().expect("Failed parse")
 }
 
-fn next_array<T: std::str::FromStr>() -> Vec<T> {
+fn next_arr<T: std::str::FromStr>() -> Vec<T> {
     raw_line()
         .split_whitespace()
         .map(|s| s.parse().ok().expect("Failed parse"))
         .collect()
 }
-
 
 fn main() {
     let mut out = BufWriter::new(stdout());

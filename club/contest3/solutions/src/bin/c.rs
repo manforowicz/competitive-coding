@@ -24,12 +24,18 @@ fn next_arr<T: std::str::FromStr>() -> Vec<T> {
 fn main() {
     let mut out = BufWriter::new(stdout());
 
-    let t: usize = next_line();
+    let mut t: i64 = next_arr()[1];
 
-    for _ in 0..t {
-        let _n: usize = next_line();
-        let arr = next_arr::<u32>();
-        let even = arr.iter().filter(|&&x| x % 2 == 0).count();
-        writeln!(out, "{}", min(even, arr.len() - even)).unwrap();
+    let list: Vec<i64> = next_arr();
+
+    t %= list.iter().sum::<i64>();
+
+    let mut i = 0;
+
+    while t - list[i] > 0 {
+        t -= list[i];
+        i += 1;
     }
+
+    writeln!(out, "{} {}", i+1, t).unwrap();
 }

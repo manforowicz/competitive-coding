@@ -28,8 +28,27 @@ fn main() {
 
     for _ in 0..t {
         let _n: usize = next_line();
-        let arr = next_arr::<u32>();
-        let even = arr.iter().filter(|&&x| x % 2 == 0).count();
-        writeln!(out, "{}", min(even, arr.len() - even)).unwrap();
+        let s = raw_line();
+        let mut seen = HashSet::with_capacity(s.len() * 2);
+
+        let mut possible = false;
+
+        for i in 0..s.len() - 1 {
+            let curr = &s[i..i + 2];
+            if (i > 1 && *curr == s[i - 2..i])
+                || (i > 0 && *curr != s[i - 1..i + 1] && seen.contains(curr))
+            {
+                possible = true;
+                break;
+            }
+
+            seen.insert(curr);
+        }
+
+        if possible {
+            writeln!(out, "YES").unwrap();
+        } else {
+            writeln!(out, "NO").unwrap();
+        }
     }
 }
