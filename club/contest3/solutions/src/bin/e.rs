@@ -1,9 +1,8 @@
 #![allow(unused_imports)]
 #![allow(dead_code)]
-use std::io::{stdin, stdout, BufWriter, Write};
 use std::cmp::{max, min};
 use std::collections::HashSet;
-
+use std::io::{stdin, stdout, BufWriter, Write};
 
 fn raw_line() -> String {
     let mut s = String::new();
@@ -25,28 +24,26 @@ fn next_arr<T: std::str::FromStr>() -> Vec<T> {
 fn main() {
     let mut out = BufWriter::new(stdout());
 
-
-    let tmp = next_arr::<u64>();
+    let tmp = next_arr::<i64>();
     let _n = tmp[0];
     let k = tmp[1];
     let d = tmp[2];
-    let a = next_arr::<u64>();
+    let a = next_arr::<i64>();
 
+    // greatest sum for [# of terms][sum % d]
+    let mut dp = vec![vec![-1; d as usize]; (k + 1) as usize];
+    dp[0][0] = 0;
 
-    // greatest sum so far where (sum % d = index)
-    let mut dp = vec![0, d];
+    for ai in a {
+        for terms in (1..=k as usize).rev() {
+            for rem in 0..d {
+                if dp[terms - 1][rem as usize] != -1 {
+                    let new_rem = ((rem + ai) % d) as usize;
 
-    // number of terms
-    let mut quantity = vec![0, d];
-
-    for elem in a {
-        for i in 0..d {
-            let new_i = ((i + elem) % d) as usize;
-            dp[new_i] = max(dp[new_i], dp[i as usize] + elem);
+                    dp[terms][new_rem] = max(dp[terms][new_rem], dp[terms - 1][rem as usize] + ai);
+                }
+            }
         }
     }
-
-
-
-    writeln!(out, "{}", 5).unwrap();
+    writeln!(out, "{}", dp[k as usize][0]).unwrap();
 }

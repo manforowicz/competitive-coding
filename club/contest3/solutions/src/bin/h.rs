@@ -1,7 +1,10 @@
+#![allow(unused_imports)]
+#![allow(dead_code)]
 #![allow(unused)]
-use std::cmp::{max, min};
-use std::collections::HashSet;
 use std::io::{stdin, stdout, BufWriter, Write};
+use std::cmp::{max, min};
+use std::collections::{HashSet, BTreeSet};
+
 
 fn raw_line() -> String {
     let mut s = String::new();
@@ -20,23 +23,25 @@ fn next_arr<T: std::str::FromStr>() -> Vec<T> {
         .collect()
 }
 
-
 fn main() {
     let mut out = BufWriter::new(stdout());
 
-    let t: usize = next_line();
+    let tmp = next_arr::<usize>();
+    let n = tmp[0];
+    let m = tmp[1];
+    let k = tmp[2];
+    let a = next_arr::<u64>();
 
-    for _ in 0..t {
-        let _ = raw_line();
-        let line = next_arr::<usize>();
-        let n = line[0];
-        let k = line[1];
+    let mut window = BTreeSet::<u64>::from_iter(a[0..m].iter().cloned());
 
-        let mut adj = vec![Vec::with_capacity(1); n + 1];
-        for _ in 1..n {
-            let edge = next_arr::<usize>();
-            adj[edge[0]].push(edge[1]);
-            adj[edge[1]].push(edge[0]);
-        }
+    let mut sum: u64 = window.iter().take(k).sum();
+
+    for i in 0..n-m {
+
+        sum -= a[i];
+
+        window.remove(&a[i]);
     }
+
+    writeln!(out, "{}", 5).unwrap();
 }
