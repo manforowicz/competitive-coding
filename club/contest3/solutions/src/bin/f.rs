@@ -20,7 +20,6 @@ fn next_arr<T: std::str::FromStr>() -> Vec<T> {
         .collect()
 }
 
-
 fn main() {
     let mut out = BufWriter::new(stdout());
 
@@ -32,11 +31,38 @@ fn main() {
         let n = line[0];
         let k = line[1];
 
-        let mut adj = vec![Vec::with_capacity(1); n + 1];
+        let mut adj = vec![HashSet::new(); n + 1];
         for _ in 1..n {
             let edge = next_arr::<usize>();
-            adj[edge[0]].push(edge[1]);
-            adj[edge[1]].push(edge[0]);
+            adj[edge[0]].insert(edge[1]);
+            adj[edge[1]].insert(edge[0]);
         }
+        let mut next_leafs = HashSet::new();
+        for i in 1..adj.len() {
+            if adj[i].len() <= 1 {
+                next_leafs.insert(i);
+            }
+        }
+
+        let mut remain = n as i32;
+
+        for _ in 0..k {
+            let leafs = next_leafs.clone();
+            next_leafs = HashSet::new();
+            if leafs.is_empty() {
+                break;
+            }
+            for leaf in leafs {
+                remain -= 1;
+                for other in (adj[leaf]).clone() {
+                    adj[leaf].remove(&other);
+                    adj[other].remove(&leaf);
+                    if adj[other].len() == 1 {
+                        next_leafs.insert(other);
+                    }
+                }
+            }
+        }
+        writeln!(out, "{}", remain).unwrap();
     }
 }
