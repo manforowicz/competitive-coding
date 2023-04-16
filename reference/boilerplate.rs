@@ -1,77 +1,68 @@
-#[allow(unused_imports)]
-use std::collections::HashSet;
-use std::io::{stdin, stdout, BufWriter, Write};
+----- Base ----------
 
-#[derive(Default)]
-struct Scanner {
-    buffer: Vec<String>,
-}
-impl Scanner {
-    fn token<T: std::str::FromStr>(&mut self) -> T {
-        if self.buffer.is_empty() {
-            let mut input = String::new();
-            stdin().read_line(&mut input).expect("Failed read");
-            self.buffer = input.split_whitespace().rev().map(String::from).collect();
-        }
-        self.buffer
-            .pop()
-            .expect("No input left")
-            .parse()
-            .ok()
-            .expect("Failed parse")
+#![allow(unused_imports, dead_code)]
+use std::cmp::{max, min};
+use std::collections::*;
+use std::fs::File;
+use std::io::*;
+
+struct Scan<T: BufRead>(T);
+
+impl<T: BufRead> Scan<T> {
+    fn raw_line(&mut self) -> String {
+        let mut s = String::new();
+        self.0.read_line(&mut s).expect("Failed read");
+        s
     }
 
-    fn line<T: std::str::FromStr>(&self) -> Vec<T> {
-        if !self.buffer.is_empty() {
-            panic!("Unread tokens!")
-        }
-        let mut input = String::new();
-        stdin().read_line(&mut input).expect("Failed read");
-        input
-            .split_whitespace()
+    fn next_line<U: std::str::FromStr>(&mut self) -> U {
+        self.raw_line().trim().parse().ok().expect("Failed parse")
+    }
+
+    fn next_arr<U: std::str::FromStr>(&mut self) -> Vec<U> {
+        self.raw_line()
+            .split_ascii_whitespace()
             .map(|s| s.parse().ok().expect("Failed parse"))
             .collect()
     }
 }
 
-fn main() {
-    let mut out = BufWriter::new(stdout());
-    let mut scan = Scanner::default();
-
-    let n = scan.token::<usize>();
-    let arr = scan.line::<u32>();
-    write!(out, "{}", n).ok();
+impl Scan<std::io::StdinLock<'static>> {
+    fn stdin() -> Self {
+        Self(stdin().lock())
+    }
 }
 
-
-
------ OR ----------
-
-#![allow(unused_imports)]
-#![allow(dead_code)]
-use std::io::{stdin, stdout, BufWriter, Write};
-use std::cmp::{max, min};
-use std::collections::HashSet;
-
-
-fn raw_line() -> String {
-    let mut s = String::new();
-    stdin().read_line(&mut s).expect("Failed read");
-    s
-}
-
-fn next_line<T: std::str::FromStr>() -> T {
-    raw_line().trim().parse().ok().expect("Failed parse")
-}
-
-fn next_arr<T: std::str::FromStr>() -> Vec<T> {
-    raw_line()
-        .split_whitespace()
-        .map(|s| s.parse().ok().expect("Failed parse"))
-        .collect()
+impl Scan<BufReader<File>> {
+    fn file(filename: &str) -> Self {
+        Self(BufReader::new(
+            File::open(filename).expect("Couldn't open file"),
+        ))
+    }
 }
 
 fn main() {
     let mut out = BufWriter::new(stdout());
-    writeln!(out, "{}", 5).unwrap();
+    let mut scan = Scan::stdin();
+    let n = scan.next_line::<i64>();
+    writeln!(out, "{}", n).unwrap();
+}
+
+------ Line Scan --------
+
+struct Scan<'a>(std::str::SplitAsciiWhitespace<'a>);
+
+impl<'a> Scan<'a> {
+    fn new(line: &'a str) -> Self {
+        Self(line.split_ascii_whitespace())
+    }
+
+    fn next<T: std::str::FromStr>(&mut self) -> T {
+        self.0
+            .next()
+            .expect("Nothing left on line")
+            .parse()
+            .ok()
+            .expect("Failed parse")
+    }
 }
