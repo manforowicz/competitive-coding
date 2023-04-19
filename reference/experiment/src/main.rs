@@ -1,4 +1,6 @@
 #![allow(unused_imports, dead_code)]
+use std::cmp::{max, min};
+use std::collections::*;
 use std::fs::File;
 use std::io::{stdin, stdout, BufRead, BufReader, BufWriter, Write};
 use std::str::{FromStr, SplitAsciiWhitespace};
@@ -7,7 +9,6 @@ struct Read<T: BufRead> {
     buf: T,
     line: String,
 }
-
 impl<T: BufRead> Read<T> {
     fn new(buf: T) -> Self {
         Read {
@@ -15,20 +16,17 @@ impl<T: BufRead> Read<T> {
             line: String::new(),
         }
     }
-
     fn line(&mut self) -> SplitAsciiWhitespace {
         self.line.clear();
         self.buf.read_line(&mut self.line).expect("Failed read");
         self.line.split_ascii_whitespace()
     }
-
     fn next_arr<U: FromStr>(&mut self) -> Vec<U> {
         self.line()
             .map(|s| s.parse().ok().expect("Failed parse"))
             .collect()
     }
 }
-
 macro_rules! scan {
     ( $read:expr, $( $type:ty ),* ) => {{
         let mut iter = $read.line();
@@ -43,10 +41,10 @@ macro_rules! scan {
 
 fn main() {
     // Setup
-    let file = BufReader::new(File::open("in.txt").unwrap());
+    // let file = BufReader::new(File::open("in.txt").unwrap());
     let stdin = stdin().lock();
     let mut read = Read::new(stdin); // or file
-    let mut out = BufWriter::new(stdout());
+    let mut out = BufWriter::new(stdout().lock());
 
     // Read different types from one line
     let (a, b, c, d) = scan!(read, bool, f32, u8, String);
