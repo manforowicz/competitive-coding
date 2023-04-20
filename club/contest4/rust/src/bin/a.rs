@@ -40,23 +40,33 @@ macro_rules! scan {
 }
 
 fn main() {
-    let file = BufReader::new(File::open("in.txt").unwrap());
-    //let stdin = stdin().lock();
-    let mut read = Read::new(file); // or file
+    let mut read = Read::new(stdin().lock());
     let mut out = BufWriter::new(stdout().lock());
 
     let t = scan!(read, u32);
 
     for _ in 0..t {
-        let n = scan!(read, u32);
+        let n = scan!(read, usize);
         let a: Vec<u32> = read.next_arr();
-        let mut frequency = HashMap::new();
-        for elem in a {
-            if let Some(count) = frequency.get_mut(&elem) {
-                *count += 1;
-            } else {
-                frequency.insert(elem, 1);
-            }
+        let zeros = a.iter().filter(|&&x| x == 0).count();
+        let ones = a.iter().filter(|&&x| x == 1).count();
+
+        // Can we squeeze a different number between every single 0?
+        if zeros <= (n + 1) / 2 {
+            writeln!(out, "0").unwrap();
+
+        // Can we group all 0s and all 1s, seperating them with another number?
+        } else if ones == 0 || zeros + ones + 1 <= n {
+            writeln!(out, "1").unwrap();
+
+        // We know there are only 1s and 0s at this point
+        // Can we squeeze a 0 between every single 1?
+        } else if ones <= (n + 1) / 2 {
+            writeln!(out, "2").unwrap();
+
+        // Sum of 3 is always impossible with only 1s and 0s
+        } else {
+            writeln!(out, "3").unwrap();
         }
     }
 }
