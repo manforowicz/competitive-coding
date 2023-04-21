@@ -41,22 +41,31 @@ macro_rules! scan {
 
 fn main() {
     let stdin = stdin();
+    let stdout = stdout();
     let mut read = Read::new(stdin.lock()); // or file
+    let mut out = BufWriter::new(stdout.lock());
 
-    let (n, m) = scan!(read, u64, u64);
+    let (n, k) = scan!(read, usize, usize);
+    let arr = read.next_arr::<i64>();
 
-    let highest_a = min(n, (m as f64).sqrt() as u64 + 1);
-    let lowest_a = (m + n - 1) / n;
+    let mut prefix = vec![0; n];
+    for i in 1..n {
+        prefix[i] = prefix[i - 1];
 
-    if lowest_a > highest_a {
-        println!("-1");
-    } else {
-        let mut best = std::u64::MAX;
-
-        for a in lowest_a..=highest_a {
-            let b = (m + a - 1) / a;
-            best = min(best, a * b);
+        if arr[i] != arr[i - 1] {
+            prefix[i] += 1;
         }
-        println!("{}", best);
+    }
+
+    let q = scan!(read, u32);
+
+    for _ in 0..q {
+        let (l, r) = scan!(read, usize, usize);
+
+        if l < k && prefix[l] != prefix[k] || n - k < r && prefix[n - k] != prefix[r] {
+            writeln!(out, "No").unwrap();
+        } else {
+            writeln!(out, "Yes").unwrap();
+        }
     }
 }
