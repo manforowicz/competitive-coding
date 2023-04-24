@@ -1,4 +1,4 @@
-#![allow(unused_imports, dead_code)]
+#![allow(unused_imports, dead_code, unused_macros)]
 use std::cmp::{max, min};
 use std::collections::*;
 use std::fs::File;
@@ -40,32 +40,6 @@ macro_rules! scan {
 }
 
 fn main() {
-    let stdin = stdin();
-    let stdout = stdout();
-    let mut read = Read::new(stdin.lock()); // or file
-    let mut out = BufWriter::new(stdout.lock());
 
-    let (n, k) = scan!(read, usize, usize);
-    let arr = read.next_arr::<i64>();
 
-    let mut prefix = vec![0; n];
-    for i in 1..n {
-        prefix[i] = prefix[i - 1];
-
-        if arr[i] != arr[i - 1] {
-            prefix[i] += 1;
-        }
-    }
-
-    let q = scan!(read, u32);
-
-    for _ in 0..q {
-        let (l, r) = scan!(read, usize, usize);
-
-        if l < k && prefix[l] != prefix[k] || n - k < r && prefix[n - k] != prefix[r] {
-            writeln!(out, "No").unwrap();
-        } else {
-            writeln!(out, "Yes").unwrap();
-        }
-    }
 }
