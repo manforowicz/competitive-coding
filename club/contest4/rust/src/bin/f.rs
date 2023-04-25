@@ -62,17 +62,23 @@ fn main() {
     for i in 0..k {
         left_end[i] = arr[i];
         for j in k..k+i {
-            left_end[i] -= arr[j];
+            left_end[i] -= arr[j] - arr[j+1];
         }
     }
 
     let mut right_end = vec![0; k];
     for i in 0..k {
-        right_end[i] = arr[i];
-        for j in i+1..k {
-            right_end[i] -= arr[j + n - k];
+        right_end[i] = arr[i + n - k];
+        for j in n+1+i-2*k..n-k {
+            let val1 = arr[j];
+            let val2 = arr[j-1];
+            println!("{val2}, {val1}");
+            right_end[i] -= arr[j] - arr[j-1];
         }
     }
+    println!("{left_end:?}");
+    println!("{right_end:?}");
+    
 
 
     let q = scan!(read, u32);
@@ -81,8 +87,9 @@ fn main() {
         l -= 1;
         r -= 1;
         let mut possible = true;
-        if l < k && n - k < r {
-            if !(continuous(&left_end[l..min(k, r)]) || continuous(&right_end[0..r + k - n])) {
+        if l <= k && n - k - 1 <= r {
+            println!("considering");
+            if !(continuous(&left_end[l..min(k, r+1)]) || continuous(&right_end[0..r + k - n + 1])) {
                 possible = false;
             }
         }
