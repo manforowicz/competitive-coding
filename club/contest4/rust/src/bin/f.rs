@@ -39,15 +39,6 @@ macro_rules! scan {
     }}
 }
 
-fn continuous(arr: &[i64]) -> bool {
-    for pair in arr.windows(2) {
-        if pair[0] != pair[1] {
-            return false;
-        }
-    }
-    return true;
-}
-
 fn main() {
     let stdin = stdin();
     let stdout = stdout();
@@ -57,47 +48,44 @@ fn main() {
     let (n, k) = scan!(read, usize, usize);
     let arr = read.next_arr::<i64>();
 
-
-    let mut left_end = vec![0; k];
-    for i in 0..k {
-        left_end[i] = arr[i];
-        for j in k..k+i {
-            left_end[i] -= arr[j] - arr[j+1];
+    let mut good_r = vec![false; n];
+    let mut arr_sim = arr.clone();
+    for i in 0..n + 1 - k {
+        let c = arr_sim[i];
+        let mut zeros = true;
+        for j in 0..k {
+            arr_sim[i + j] -= c;
+            if arr_sim[i + j] != 0 {
+                zeros = false;
+            }
         }
+        good_r[i + k - 1] = zeros;
     }
+    println!("{arr_sim:?}");
 
-    let mut right_end = vec![0; k];
-    for i in 0..k {
-        right_end[i] = arr[i + n - k];
-        for j in n+1+i-2*k..n-k {
-            let val1 = arr[j];
-            let val2 = arr[j-1];
-            println!("{val2}, {val1}");
-            right_end[i] -= arr[j] - arr[j-1];
+    let mut good_l = vec![false; n];
+    arr_sim = arr.clone();
+    for i in (k - 1..n).rev() {
+        let c = arr_sim[i];
+        let mut zeros = true;
+        for j in 0..k {
+            arr_sim[i - j] -= c;
+            if arr_sim[i - j] != 0 {
+                zeros = false;
+            }
         }
+        good_l[i + 1 - k] = zeros;
     }
-    println!("{left_end:?}");
-    println!("{right_end:?}");
-    
-
+    println!("{arr_sim:?}");
 
     let q = scan!(read, u32);
     for _ in 0..q {
-        let (mut l, mut r) = scan!(read, usize, usize);
-        l -= 1;
-        r -= 1;
-        let mut possible = true;
-        if l <= k && n - k - 1 <= r {
-            println!("considering");
-            if !(continuous(&left_end[l..min(k, r+1)]) || continuous(&right_end[0..r + k - n + 1])) {
-                possible = false;
-            }
-        }
-        if possible {
+        let (l, r) = scan!(read, usize, usize);
+
+        if good_l[l - 1] || good_r[r - 1] {
             writeln!(out, "Yes").unwrap();
         } else {
             writeln!(out, "No").unwrap();
         }
-
     }
 }
