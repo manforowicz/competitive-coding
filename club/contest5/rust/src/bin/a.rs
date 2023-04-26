@@ -39,36 +39,45 @@ macro_rules! scan {
     }}
 }
 
+fn get_mex(arr: &mut [i64]) -> i64 {
+    arr.sort_unstable();
+
+    let mut curr = -1;
+    for elem in arr {
+        if *elem > curr + 1 {
+            return curr + 1;
+        }
+        curr = *elem;
+    }
+    return curr + 1;
+}
+
 fn main() {
-    // Setup
-    // let file = BufReader::new(File::open("in.txt").unwrap());
     let stdin = stdin();
-    let mut read = Read::new(stdin.lock()); // or file
+    let stdout = stdout();
+    let mut read = Read::new(stdin.lock());
+    let mut out = BufWriter::new(stdout.lock());
 
-    let _n = scan!(read, u32);
+    let (n, m) = scan!(read, i64, usize);
+    let arr = read.next_arr::<i64>();
 
-    let s = scan!(read, String);
+    let mut elems_at_j = vec![Vec::<i64>::new(); m];
 
-    let mut length = 0;
-    let mut best_length = 0;
-    let mut has_dash = false;
-    let mut has_o = false;
-    
-    for c in s.bytes() {
-        if c == b'-' {
-            best_length = max(length, best_length);
-            length = 0;
-            has_dash = true;
-        } else {
-            length += 1;
-            has_o = true;
+    for i in 0..n {
+        let start = arr[i as usize];
+        let increment = i + 1;
+        let upper_j = (n - start) / increment + 1;
+        let lower_j = (0 - start) / increment;
+
+        for j in max(1, lower_j)..=min(upper_j, m as i64) {
+            let elem = start + increment * j;
+            if elem >= 0 {
+                elems_at_j[j as usize - 1].push(elem);
+            }
         }
     }
-    best_length = max(best_length, length);
 
-    if has_dash && has_o {
-        println!("{}", best_length);
-    } else {
-        println!("-1");
+    for j in 0..m {
+        writeln!(out, "{}", get_mex(&mut elems_at_j[j])).unwrap();
     }
 }

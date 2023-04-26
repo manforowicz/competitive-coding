@@ -42,9 +42,10 @@ macro_rules! scan {
 fn main() {
     // Setup
     // let file = BufReader::new(File::open("in.txt").unwrap());
-    let stdin = stdin().lock();
-    let mut read = Read::new(stdin); // or file
-    let mut out = BufWriter::new(stdout().lock());
+    let stdin = stdin();
+    let stdout = stdout();
+    let mut read = Read::new(stdin.lock()); // or file
+    let mut out = BufWriter::new(stdout.lock());
 
     // Read different types from one line
     let (a, b, c, d) = scan!(read, bool, f32, u8, String);
