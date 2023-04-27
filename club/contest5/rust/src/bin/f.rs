@@ -42,33 +42,19 @@ macro_rules! scan {
 fn main() {
     let stdin = stdin();
     let stdout = stdout();
-    let mut read = Read::new(stdin.lock()); // or file
+    let mut read = Read::new(stdin.lock());
     let mut out = BufWriter::new(stdout.lock());
 
-    let t = scan!(read, u32);
-    for _ in 0..t {
-        let n = scan!(read, usize);
-        let arr = read.next_arr::<u32>();
+    let k = scan!(read, u32);
 
-        writeln!(out, "{}", n - 1).unwrap();
-
-        if n - 1 == 0 {
-            continue;
-        };
-
-        writeln!(out, "{} {}", 1, n).unwrap();
-        let target = if (arr[0] + arr[n - 1]) % 2 == 0 {
-            arr[n - 1]
-        } else {
-            arr[0]
-        };
-
-        for i in 1..n - 1 {
-            if (target + arr[i]) % 2 == 0 {
-                writeln!(out, "{} {}", i + 1, n).unwrap();
-            } else {
-                writeln!(out, "{} {}", 1, i + 1).unwrap();
-            }
+    for _ in 0..k {
+        let n = scan!(read, u32);
+        for i in 0..n / 2 {
+            write!(out, "{} {} ", n - i, i + 1).unwrap();
         }
+        if n % 2 != 0 {
+            write!(out, "{} ", n / 2 + 1).unwrap();
+        }
+        writeln!(out).unwrap();
     }
 }
