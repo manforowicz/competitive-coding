@@ -1,8 +1,5 @@
-#![allow(unused_imports, dead_code)]
-use std::cmp::{max, min};
-use std::collections::*;
-use std::fs::File;
-use std::io::{stdin, stdout, BufRead, BufReader, BufWriter, Write};
+use std::cmp::max;
+use std::io::{stdin, BufRead};
 use std::str::{FromStr, SplitAsciiWhitespace};
 
 struct Read<T: BufRead> {
@@ -41,12 +38,24 @@ macro_rules! scan {
 
 fn main() {
     let stdin = stdin();
-    let stdout = stdout();
     let mut read = Read::new(stdin.lock());
-    let mut out = BufWriter::new(stdout.lock());
 
-    let (n, k) = scan!(read, usize, usize);
-    let moves = read.next_arr::<usize>();
-    let mut dp = vec![0; n];
-    
+    let (n, _k) = scan!(read, usize, usize);
+    let actions = read.next_arr::<usize>();
+
+    // Maximum number of stones person who moves first
+    // can gain if the pile starts with i stones,
+    let mut dp = vec![0; n+1];
+
+    for i in 1..=n {
+        let mut max_gain = 0;
+        for action in &actions {
+            if *action <= i {
+                let gain = i - dp[i - action];
+                max_gain = max(max_gain, gain);
+            }
+        }
+        dp[i] = max_gain;
+    }
+    println!("{}", dp[n]); 
 }
