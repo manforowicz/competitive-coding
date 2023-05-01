@@ -1,8 +1,6 @@
 #![allow(unused_imports, dead_code, unused_macros)]
-use std::cmp::{max, min};
 use std::collections::*;
-use std::fs::File;
-use std::io::{stdin, stdout, BufRead, BufReader, BufWriter, Write};
+use std::io::{stdin, stdout, BufRead, BufWriter, Write};
 use std::str::{FromStr, SplitAsciiWhitespace};
 
 struct Read<T: BufRead> {
@@ -41,7 +39,7 @@ macro_rules! scan {
 
 fn get_prime_factors(mut num: usize, primes: &mut Vec<usize>, sieve: &Vec<usize>) {
     primes.clear();
-    while sieve[num] != 0 {
+    while num != 1 {
         let prime_factor = sieve[num];
         primes.push(prime_factor);
         while num % prime_factor == 0 {
@@ -52,10 +50,9 @@ fn get_prime_factors(mut num: usize, primes: &mut Vec<usize>, sieve: &Vec<usize>
 
 fn generate_sieve(max: usize) -> Vec<usize> {
     let mut sieve = vec![0; max + 1];
-
     for i in 2..sieve.len() {
         if sieve[i] == 0 {
-            for multiple in 1..sieve.len() / i {
+            for multiple in 1..=(sieve.len() - 1) / i {
                 sieve[i * multiple] = i;
             }
         }
@@ -63,68 +60,87 @@ fn generate_sieve(max: usize) -> Vec<usize> {
     sieve
 }
 
+#[derive(Clone, Default, Debug)]
+struct Link {
+    spider_i: usize,
+    dest: usize,
+}
+
 fn main() {
     let stdin = stdin();
     let stdout = stdout();
-    let mut read = Read::new(stdin.lock()); // or file
+    let mut read = Read::new(stdin.lock());
     let mut out = BufWriter::new(stdout.lock());
 
     let _n = scan!(read, usize);
     let spiders = read.next_arr::<usize>();
     let max_legs = *spiders.iter().max().unwrap();
-
     let sieve = generate_sieve(max_legs);
 
-    let mut links = vec![Vec::<usize>::new(); max_legs + 1];
-
-    let mut prime_factors = Vec::new();
-
-    for legs in &spiders {
-        get_prime_factors(*legs, &mut prime_factors, &sieve);
-        for i in 0..prime_factors.len() {
-            for j in i + 1..prime_factors.len() {
-                links[i].push(j);
-                links[j].push(i);
+    let mut links = vec![Vec::<Link>::new(); max_legs + 1];
+    let mut primes = Vec::new();
+    for spider_i in 0..spiders.len() {
+        get_prime_factors(spiders[spider_i], &mut primes, &sieve);
+        for (i, first) in primes.iter().enumerate() {
+            for second in primes[i + 1..].iter() {
+                links[*first].push(Link {
+                    spider_i,
+                    dest: *second,
+                });
+                links[*second].push(Link {
+                    spider_i,
+                    dest: *first,
+                });
             }
         }
     }
 
     let (s, t) = scan!(read, usize, usize);
     let mut s_primes = Vec::new();
-    get_prime_factors(spiders[s + 1], &mut s_primes, &sieve);
+    get_prime_factors(spiders[s - 1], &mut s_primes, &sieve);
     let mut t_primes = Vec::new();
-    get_prime_factors(spiders[t + 1], &mut t_primes, &sieve);
+    get_prime_factors(spiders[t - 1], &mut t_primes, &sieve);
 
     let mut visited = vec![false; max_legs + 1];
-    let mut came_from = vec![0; max_legs + 1];
-
-    let mut curr = VecDeque::from(t_primes);
-
-    let mut success = false;
+    let mut came_from = vec![Link::default(); max_legs + 1];
+    let mut curr = VecDeque::from(t_primes.clone());
+    let mut ending = None;
 
     while !curr.is_empty() {
         let node = curr.pop_front().unwrap();
 
         if s_primes.contains(&node) {
-            success = true;
-            let mut path = Vec::new();
-            let mut backtrack = node;
-            while came_from[backtrack] != 0 {
-                path.push(backtrack);
-                backtrack = came_from[backtrack];
-            }
+            ending = Some(node);
+            break;
         }
-
         for link in &links[node] {
-            if !visited[*link] {
-                visited[*link] = true;
-                came_from[*link] = node;
-                curr.push_back(*link);
+            if !visited[link.dest] {
+                visited[link.dest] = true;
+                came_from[link.dest] = Link {
+                    spider_i: link.spider_i,
+                    dest: node,
+                };
+                curr.push_back(link.dest);
             }
         }
     }
 
-    if success {
+    if s == t {
+        writeln!(out, "1\n{}", s).unwrap();
+    } else if let Some(mut node) = ending {
+        let mut path = Vec::new();
+        while !t_primes.contains(&node) {
+            path.push(came_from[node].spider_i + 1);
+            node = came_from[node].dest;
+        }
 
+        writeln!(out, "{}", path.len() + 2).unwrap();
+        write!(out, "{} ", s).unwrap();
+        for spider in path {
+            write!(out, "{} ", spider).unwrap();
+        }
+        writeln!(out, "{} ", t).unwrap();
+    } else {
+        writeln!(out, "-1").unwrap();
     }
 }

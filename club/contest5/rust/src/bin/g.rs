@@ -1,9 +1,9 @@
 #![allow(unused_imports, dead_code)]
-use std::iter::FromIterator;
 use std::cmp::{max, min};
 use std::collections::*;
 use std::fs::File;
 use std::io::{stdin, stdout, BufRead, BufReader, BufWriter, Write};
+use std::iter::FromIterator;
 use std::str::{FromStr, SplitAsciiWhitespace};
 
 struct Read<T: BufRead> {
@@ -50,34 +50,38 @@ fn get_pow2_above(num: u32) -> u32 {
 
 fn main() {
     let stdin = stdin();
-    let stdout = stdout();
     let mut read = Read::new(stdin.lock()); // or file
-    let mut out = BufWriter::new(stdout.lock());
 
-    let n = scan!(read, usize);
-    let arr = read.next_arr::<u32>();
+    let _n = scan!(read, usize);
+    let mut balls = read.next_arr::<u32>();
+    balls.sort_unstable();
+    balls.reverse();
 
-    let mut arr_set = HashMap::<u32, u32>::new();
-    for elem in &arr {
-        if let Some(count) = arr_set.get_mut(elem) {
-            *count += 1;
+    // freq[num written on ball] = frequency
+    let mut freq = HashMap::<u32, u32>::new();
+
+    for ball in &balls {
+        if let Some(freq) = freq.get_mut(ball) {
+            *freq += 1;
         } else {
-            arr_set.insert(*elem, 1);
+            freq.insert(*ball, 1);
         }
     }
+    balls.dedup();
 
-    let max_int = *arr.iter().max().unwrap();
+    let mut pairs = 0;
+    for ball in balls {
+        let other = get_pow2_above(ball) - ball;
 
-    for i in 0..n {
-        let mut target = get_pow2_above(arr[i]);
-        while target - arr[i] <= max_int {
-            //if arr_set.contains(&(target - arr[i])) {
-            //    peers[i] += 1;
-            //}
-            target *= 2;
+        if freq.contains_key(&other) {
+            if ball == other {
+                pairs += freq[&ball] / 2;
+            } else {
+                let new_pairs = min(freq[&ball], freq[&other]);
+                pairs += new_pairs;
+                *freq.get_mut(&other).unwrap() -= new_pairs;
+            }
         }
-        
     }
-
-
+    println!("{}", pairs);
 }
