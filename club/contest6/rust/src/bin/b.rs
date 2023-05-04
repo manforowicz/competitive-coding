@@ -1,6 +1,7 @@
+#![allow(unused_imports, dead_code)]
 use std::io::{stdin, stdout, BufRead, BufWriter, Write};
-use std::str::{FromStr, SplitAsciiWhitespace};
 use std::iter::once;
+use std::str::{FromStr, SplitAsciiWhitespace};
 
 struct Read<T: BufRead> {
     buf: T,
@@ -36,16 +37,43 @@ macro_rules! scan {
     }}
 }
 
-struct Car {
-    i: u32,
+struct Car<'a> {
+    i: usize,
     time: f64,
+    left: bool,
+    flags: &'a Vec<u32>,
 }
 
-impl Car {
-    fn get_time_to(next_i: usize, flags: &Vec<u32>) {
+impl<'a> Car<'a> {
+    fn speed(&self) -> usize {
+        if self.left {
+            self.i + 1
+        } else {
+            self.flags.len() - self.i
+        }
+    }
+
+    fn dist_to_next(&self) -> u32 {
+        if self.left {
+            self.flags[self.i + 1] - self.flags[self.i]
+        } else {
+            self.flags[self.i] - self.flags[self.i - 1]
+        }
+    }
+
+    fn time_to_next(&self) -> f64 {
+        self.dist_to_next() as f64 / self.speed() as f64
+    }
+
+    fn go_to_next(&mut self) {
+        self.time += self.time_to_next();
+        if self.left {
+            self.i += 1;
+        } else {
+            self.i -= 1;
+        }
     }
 }
-
 
 fn main() {
     let stdin = stdin();
@@ -57,16 +85,44 @@ fn main() {
 
     for _ in 0..t {
         let (n, l) = scan!(read, usize, u32);
-        let flags = once(0)
-            .chain(read.line().map(|s| s.parse().ok().unwrap()))
+
+        let flags: Vec<u32> = once(0)
+            .chain(read.line().map(|s| s.parse().expect("Failed parse")))
             .chain(once(l))
-            .collect::<Vec<u32>>();
-        
-        let left = Car { i: 0, time: 0.0 };
-        let right = Car { i: l, time: 0.0 };
+            .collect();
 
-        while left.i - right.i > 1 {
+        let mut left = Car {
+            i: 0,
+            time: 0.0,
+            left: true,
+            flags: &flags,
+        };
+        let mut right = Car {
+            i: n + 1,
+            time: 0.0,
+            left: false,
+            flags: &flags,
+        };
 
+        while right.i - left.i > 1 {
+            if left.time + left.time_to_next() < right.time + right.time_to_next() {
+                left.go_to_next();
+            } else {
+                right.go_to_next();
+            }
         }
+
+        let dist_remaining = left.dist_to_next() as f64
+            - if left.time < right.time {
+                left.speed() as f64 * (right.time - left.time)
+            } else {
+                right.speed() as f64 * (left.time - right.time)
+            };
+
+        let remaining_time = dist_remaining / (left.speed() + right.speed()) as f64;
+
+        let time = f64::max(left.time, right.time) + remaining_time;
+
+        writeln!(out, "{}", time).unwrap();
     }
 }
