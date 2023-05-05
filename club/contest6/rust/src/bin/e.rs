@@ -47,14 +47,13 @@ fn main() {
 
     let t = scan!(read, u32);
     for _ in 0..t {
-        let n = scan!(read, u32);
+        //let n = scan!(read, u32);
         let mut arr = read.next_arr::<usize>();
         arr.sort_unstable();
         for (i, elem) in arr.iter().enumerate() {
             if *elem > i {
                 write!(out, "-1").unwrap();
             } else {
-                write!(out )
             }
         }
     }
