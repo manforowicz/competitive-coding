@@ -1,4 +1,4 @@
-#![allow(unused_imports, dead_code, unused_macros)]
+#![allow(unused_imports, dead_code)]
 use std::cmp::{max, min};
 use std::collections::*;
 use std::fs::File;
@@ -40,11 +40,22 @@ macro_rules! scan {
 }
 
 fn main() {
-    //let stdin = stdin();
-    //let stdout = stdout();
-    //let mut read = Read::new(stdin.lock());
-    //let mut out = BufWriter::new(stdout.lock());
+    let stdin = stdin();
+    let stdout = stdout();
+    let mut read = Read::new(stdin.lock());
+    let mut out = BufWriter::new(stdout.lock());
 
-
-    //let (n, q) = scan!(read, u32, u32);
+    let t = scan!(read, u32);
+    for _ in 0..t {
+        let n = scan!(read, u32);
+        let mut arr = read.next_arr::<usize>();
+        arr.sort_unstable();
+        for (i, elem) in arr.iter().enumerate() {
+            if *elem > i {
+                write!(out, "-1").unwrap();
+            } else {
+                write!(out )
+            }
+        }
+    }
 }
