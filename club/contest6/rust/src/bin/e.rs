@@ -82,7 +82,11 @@ fn main() {
         let mut added = 0;
 
         let mut i = 0;
+
         let mut impossible = false;
+        if arr[0] != 0 {
+            impossible = true;
+        }
         for mex in 1..=n {
             while i + 1 < n && arr[i + 1] < mex {
                 i += 1;
