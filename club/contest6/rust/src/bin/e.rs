@@ -44,16 +44,18 @@ fn num_to_increment(arr: &[usize], i: usize, mex: usize) -> usize {
 
     let mut left = 0;
     let mut right = i - 1;
-    loop {
-        let mid = (left + right) / 2;
-        if mex - 1 - arr[mid] > i - mid {
+
+    while left != right {
+        let mid = (left + right + 1) / 2;
+        let x = i - mid;
+        let y = mex - 1 - arr[mid];
+        if y > x {
             right = mid - 1;
-        } else if mex - 1 - arr[mid] < i - mid {
-            left = mid + 1;
-        } else if mex - 1 - arr[mid] == i - mid {
-            return i - mid;
+        } else {
+            left = mid;
         }
     }
+    i - left
 }
 
 // counts number of val starting at index start
